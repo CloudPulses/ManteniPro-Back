@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/AuthController';
-import { authenticateToken } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Ruta pública
+// Rutas públicas
 router.post('/login', AuthController.login);
-
-// Ruta protegida (solo usuarios autenticados pueden registrar nuevos usuarios)
-router.post('/register', authenticateToken, AuthController.register);
+router.post('/register', AuthController.register);
 
 export default router;

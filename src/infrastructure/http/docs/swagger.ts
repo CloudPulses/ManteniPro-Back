@@ -53,8 +53,9 @@ export const swaggerDocument: OpenAPIV3 = {
       },
       RegisterRequest: {
         type: 'object',
-        required: ['name', 'email', 'password', 'roleId'],
+        required: ['tenantSlug', 'name', 'email', 'password', 'roleId'],
         properties: {
+          tenantSlug: { type: 'string', example: 'mi-empresa' },
           name: { type: 'string', example: 'Juan Pérez' },
           email: { type: 'string', format: 'email', example: 'juan@empresa.com' },
           password: { type: 'string', minLength: 8, example: 'contraseña123' },
@@ -294,8 +295,7 @@ export const swaggerDocument: OpenAPIV3 = {
       post: {
         tags: ['Autenticación'],
         summary: 'Registrar usuario',
-        description: 'Crea un nuevo usuario en el tenant del usuario autenticado.',
-        security: [{ BearerAuth: [] }],
+        description: 'Crea un nuevo usuario en el tenant identificado por tenantSlug. Ruta pública.',
         requestBody: {
           required: true,
           content: {

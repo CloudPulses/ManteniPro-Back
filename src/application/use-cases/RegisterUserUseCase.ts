@@ -9,13 +9,19 @@ export class RegisterUserUseCase {
     private passwordService: PasswordService
   ) {}
 
-  async execute(tenantId: number, data: RegisterDTO): Promise<Omit<User, 'passwordHash'>> {
-    if (!data.name || !data.email || !data.password) {
-      throw new Error('Nombre, email y contraseña son obligatorios.');
+  async execute(data: RegisterDTO): Promise<Omit<User, 'passwordHash'>> {
+    if (!data.tenantSlug || !data.name || !data.email || !data.password) {
+      throw new Error('tenantSlug, nombre, email y contraseña son obligatorios.');
     }
 
     if (data.password.length < 8) {
       throw new Error('La contraseña debe tener al menos 8 caracteres.');
+    }
+
+    // Resolver tenant por slug
+    const tenantId = await this.userRepository.findTenantIdBySlug(data.tenantSlug);
+    if (!tenantId) {
+      throw new Error('Organización no encontrada.');
     }
 
     // Verificar que el email no exista ya en el tenant

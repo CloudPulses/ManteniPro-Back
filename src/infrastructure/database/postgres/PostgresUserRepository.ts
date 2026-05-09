@@ -22,6 +22,12 @@ export class PostgresUserRepository implements UserRepository {
     return this.mapToModel(res.rows[0]);
   }
 
+  async findTenantIdBySlug(slug: string): Promise<number | null> {
+    const res = await query('SELECT id FROM tenants WHERE slug = $1 AND active = true', [slug]);
+    if (res.rows.length === 0) return null;
+    return res.rows[0].id;
+  }
+
   async create(tenantId: number, data: RegisterDTO, hashedPassword: string): Promise<User> {
     const sql = `
       INSERT INTO users (uuid, tenant_id, role_id, name, email, phone, password)

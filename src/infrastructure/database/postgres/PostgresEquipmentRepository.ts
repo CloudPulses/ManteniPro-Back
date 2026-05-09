@@ -9,6 +9,12 @@ export class PostgresEquipmentRepository implements EquipmentRepository {
     return res.rows.map(this.mapToModel);
   }
 
+  async findById(tenantId: number, id: number): Promise<Equipment | null> {
+    const res = await query('SELECT * FROM equipments WHERE tenant_id = $1 AND id = $2', [tenantId, id]);
+    if (res.rows.length === 0) return null;
+    return this.mapToModel(res.rows[0]);
+  }
+
   async create(tenantId: number, data: CreateEquipmentDTO): Promise<Equipment> {
     const sql = `
       INSERT INTO equipments (

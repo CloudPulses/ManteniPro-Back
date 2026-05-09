@@ -1,4 +1,3 @@
-import { Pool } from 'pg';
 import { ClientRepository } from '../../../domain/repositories/ClientRepository';
 import { Client } from '../../../domain/models/Client';
 import { CreateClientDTO, UpdateClientDTO } from '../../../domain/dtos/ClientDTO';

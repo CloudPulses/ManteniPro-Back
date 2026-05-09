@@ -3,8 +3,13 @@ import { User } from '../../../domain/models/User';
 import { query } from '../../../config/db';
 
 export class PostgresUserRepository implements UserRepository {
-  async findByEmail(email: string): Promise<User | null> {
-    const res = await query('SELECT * FROM users WHERE email = $1 AND active = true', [email]);
+  async findByTenantSlugAndEmail(tenantSlug: string, email: string): Promise<User | null> {
+    const sql = `
+      SELECT u.* FROM users u
+      JOIN tenants t ON u.tenant_id = t.id
+      WHERE t.slug = $1 AND u.email = $2 AND u.active = true AND t.active = true
+    `;
+    const res = await query(sql, [tenantSlug, email]);
     if (res.rows.length === 0) return null;
     
     const row = res.rows[0];

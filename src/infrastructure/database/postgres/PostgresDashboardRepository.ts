@@ -19,9 +19,9 @@ export class PostgresDashboardRepository implements DashboardRepository {
       JOIN service_catalog sc ON mo.service_id = sc.id
       JOIN users u ON mo.assigned_user_id = u.id
       JOIN maintenance_statuses ms ON mo.status_id = ms.id
-      WHERE mo.tenant_id = $1
+      WHERE mo.tenant_id = $1 AND mo.scheduled_date >= CURRENT_DATE
       ORDER BY mo.scheduled_date ASC, mo.scheduled_time ASC
-      LIMIT 10
+      LIMIT 20
     `;
 
     const res = await query(upcomingSql, [tenantId]);

@@ -15,6 +15,18 @@ export class EquipmentController {
     }
   }
 
+  static async getById(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { res.status(401).end(); return; }
+      const id = parseInt(req.params.id as string, 10);
+      const equipment = await equipmentRepository.findById(req.user.tenantId, id);
+      if (!equipment) { res.status(404).json({ message: 'Equipo no encontrado' }); return; }
+      res.status(200).json(equipment);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   static async create(req: AuthRequest, res: Response): Promise<void> {
     try {
       if (!req.user) { res.status(401).end(); return; }

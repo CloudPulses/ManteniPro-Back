@@ -1,11 +1,15 @@
 import { UserRepository } from '../../domain/repositories/UserRepository';
+import { PasswordService } from '../../domain/services/PasswordService';
 import { LoginDTO, AuthResponseDTO } from '../../domain/dtos/AuthDTO';
 import { SignJWT } from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'supersecretkey');
 
 export class LoginUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private passwordService: PasswordService
+  ) {}
 
   async execute(data: LoginDTO): Promise<AuthResponseDTO> {
     if (!data.tenantSlug || !data.email || !data.password) {
@@ -18,8 +22,7 @@ export class LoginUseCase {
       throw new Error('Credenciales incorrectas');
     }
 
-    // TODO: Cambiar por verificación de hash real (bcrypt, argon2, etc.)
-    const isPasswordValid = data.password === user.passwordHash;
+    const isPasswordValid = await this.passwordService.verify(user.passwordHash, data.password);
 
     if (!isPasswordValid) {
       throw new Error('Credenciales incorrectas');

@@ -4,6 +4,14 @@ export interface LoginDTO {
   password: string;
 }
 
+export interface RegisterDTO {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  roleId: number;
+}
+
 export interface AuthResponseDTO {
   token: string;
   user: {

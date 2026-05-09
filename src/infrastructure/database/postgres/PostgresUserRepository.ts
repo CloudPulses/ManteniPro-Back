@@ -1,5 +1,6 @@
 import { UserRepository } from '../../../domain/repositories/UserRepository';
 import { User } from '../../../domain/models/User';
+import { RegisterDTO } from '../../../domain/dtos/AuthDTO';
 import { query } from '../../../config/db';
 
 export class PostgresUserRepository implements UserRepository {
@@ -11,8 +12,33 @@ export class PostgresUserRepository implements UserRepository {
     `;
     const res = await query(sql, [tenantSlug, email]);
     if (res.rows.length === 0) return null;
-    
-    const row = res.rows[0];
+    return this.mapToModel(res.rows[0]);
+  }
+
+  async findByTenantAndEmail(tenantId: number, email: string): Promise<User | null> {
+    const sql = 'SELECT * FROM users WHERE tenant_id = $1 AND email = $2 AND active = true';
+    const res = await query(sql, [tenantId, email]);
+    if (res.rows.length === 0) return null;
+    return this.mapToModel(res.rows[0]);
+  }
+
+  async create(tenantId: number, data: RegisterDTO, hashedPassword: string): Promise<User> {
+    const sql = `
+      INSERT INTO users (uuid, tenant_id, role_id, name, email, phone, password)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
+    const res = await query(sql, [
+      tenantId, data.roleId, data.name, data.email, data.phone || null, hashedPassword
+    ]);
+    return this.mapToModel(res.rows[0]);
+  }
+
+  async updateLastLogin(userId: number): Promise<void> {
+    await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [userId]);
+  }
+
+  private mapToModel(row: any): User {
     return new User(
       row.id,
       row.uuid,
@@ -23,9 +49,5 @@ export class PostgresUserRepository implements UserRepository {
       row.password,
       row.active
     );
-  }
-
-  async updateLastLogin(userId: number): Promise<void> {
-    await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [userId]);
   }
 }

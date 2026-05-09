@@ -12,8 +12,8 @@ export const swaggerDocument: OpenAPIV3 = {
   },
   servers: [
     {
-      url: 'http://localhost:3000/api',
-      description: 'Servidor de desarrollo',
+      url: '/api',
+      description: 'Servidor actual',
     },
   ],
   components: {

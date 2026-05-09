@@ -5,6 +5,7 @@ export interface LoginDTO {
 }
 
 export interface RegisterDTO {
+  tenantSlug: string;
   name: string;
   email: string;
   password: string;
